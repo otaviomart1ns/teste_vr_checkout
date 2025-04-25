@@ -1,0 +1,30 @@
+# Go
+/bin/
+/vendor/
+/*.exe
+/*.exe~
+/*.dll
+/*.so
+/*.dylib
+*.test
+*.out
+
+# IDEs e editors
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log
+
+# Docker
+*.env
+.env.*
+docker-compose.override.yml
+
+# Go modules
+go.sum
+
+# SQLC
+sqlc.yaml
+sqlc.generated.go
