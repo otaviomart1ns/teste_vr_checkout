@@ -3,6 +3,8 @@ package entities
 import (
 	"errors"
 	"time"
+
+	"github.com/otaviomart1ns/teste_vr_checkout/backend/internal/pkg/utils"
 )
 
 type Transaction struct {
@@ -16,7 +18,7 @@ func NewTransaction(description string, date time.Time, valueUSD float64) (*Tran
 	if len(description) == 0 || len(description) > 50 {
 		return nil, errors.New("descrição inválida: deve ter entre 1 e 50 caracteres")
 	}
-	if !isAlphanumeric(description) {
+	if !utils.IsAlphanumeric(description) {
 		return nil, errors.New("descrição inválida: apenas caracteres alfanuméricos são permitidos")
 	}
 	if valueUSD <= 0 {
@@ -26,22 +28,6 @@ func NewTransaction(description string, date time.Time, valueUSD float64) (*Tran
 	return &Transaction{
 		Description: description,
 		Date:        date,
-		ValueUSD:    roundToCents(valueUSD),
+		ValueUSD:    utils.RoundToCents(valueUSD),
 	}, nil
-}
-
-func roundToCents(value float64) float64 {
-	return float64(int(value*100+0.5)) / 100
-}
-
-func isAlphanumeric(s string) bool {
-	for _, r := range s {
-		if !(r >= 'a' && r <= 'z') &&
-			!(r >= 'A' && r <= 'Z') &&
-			!(r >= '0' && r <= '9') &&
-			!(r == ' ') {
-			return false
-		}
-	}
-	return true
 }
