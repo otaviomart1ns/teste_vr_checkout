@@ -5,83 +5,69 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
+	"github.com/otaviomart1ns/teste_vr_checkout/backend/internal/domain/entities"
+	"github.com/otaviomart1ns/teste_vr_checkout/backend/internal/domain/gateways"
+	"github.com/otaviomart1ns/teste_vr_checkout/backend/internal/interfaces/api/dto"
 )
 
-type CreateTransactionRequest struct {
-	Description string  `json:"description" binding:"required,alphanum,max=50"`
-	Date        string  `json:"date" binding:"required,datetime=2006-01-02"`
-	Amount      float64 `json:"amount" binding:"required,gt=0,lt=100000"`
+type TransactionService interface {
+	CreateTransaction(description string, date time.Time, amount float64) error
+	GetTransactionWithConversion(id string, currency string) (*entities.Transaction, *gateways.CurrencyConversion, error)
 }
 
-type TransactionPublisher interface {
-	PublishTransaction(body []byte) error
-}
 
 type TransactionHandler struct {
-	Publisher TransactionPublisher
+	service TransactionService
 }
 
-func NewTransactionHandler(publisher TransactionPublisher) *TransactionHandler {
-	return &TransactionHandler{Publisher: publisher}
+func NewTransactionHandler(service TransactionService) *TransactionHandler {
+	return &TransactionHandler{service: service}
 }
+
 func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
-	var req CreateTransactionRequest
+	var req dto.CreateTransactionRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos ou campos faltando"})
 		return
 	}
 
-	date, err := time.Parse("2006-01-02", req.Date)
+	parsedDate, err := time.Parse("2006-01-02", req.Date)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format, use YYYY-MM-DD"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Formato da data inválido (use YYYY-MM-DD)"})
 		return
 	}
 
-	msg := map[string]interface{}{
-		"id":          uuid.New(),
-		"description": req.Description,
-		"date":        date.Format("2006-01-02"),
-		"amount":      req.Amount,
-	}
-
-	body, err := json.Marshal(msg)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to encode message"})
-		return
-	}
-
-	if err := h.Publisher.PublishTransaction(body); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send message to queue"})
+	if err := h.service.CreateTransaction(req.Description, parsedDate, req.AmountUSD); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.Status(http.StatusAccepted)
 }
 
-func (h *TransactionHandler) GetTransactionWithConversion(service usecases.TransactionService, converter usecases.CurrencyConverter) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		idStr := c.Param("id")
-		currency := c.Query("currency")
-
-		id, err := uuid.Parse(idStr)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
-			return
-		}
-
-		if currency == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "currency is required"})
-			return
-		}
-
-		result, err := service.GetTransactionWithConversion(c, id, currency, converter)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusOK, result)
+func (h *TransactionHandler) GetTransaction(c *gin.Context) {
+	id := c.Param("id")
+	currency := c.Query("currency")
+	if currency == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Query param 'currency' é obrigatório"})
+		return
 	}
+
+	tx, converted, err := h.service.GetTransactionWithConversion(id, currency)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.TransactionResponse{
+		ID:              tx.ID,
+		Description:     tx.Description,
+		Date:            tx.Date.Format("2006-01-02"),
+		AmountUSD:       tx.ValueUSD,
+		ExchangeRate:    converted.Rate,
+		AmountConverted: converted.Converted,
+		ToCurrency:      converted.ToCurrency,
+		RateDate:        converted.DateUsed.Format("2006-01-02"),
+	})
 }
