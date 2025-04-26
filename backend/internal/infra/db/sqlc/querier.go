@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.29.0
 
-package db
+package sqlc
 
 import (
 	"context"
@@ -13,7 +13,6 @@ import (
 type Querier interface {
 	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error)
 	GetTransaction(ctx context.Context, id uuid.UUID) (Transaction, error)
-	ListTransactions(ctx context.Context) ([]Transaction, error)
 }
 
 var _ Querier = (*Queries)(nil)

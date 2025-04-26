@@ -3,7 +3,7 @@
 //   sqlc v1.29.0
 // source: transactions.sql
 
-package db
+package sqlc
 
 import (
 	"context"
@@ -70,41 +70,4 @@ func (q *Queries) GetTransaction(ctx context.Context, id uuid.UUID) (Transaction
 		&i.Amount,
 	)
 	return i, err
-}
-
-const listTransactions = `-- name: ListTransactions :many
-SELECT
-  id,
-  description,
-  date,
-  amount
-FROM 
-    transactions
-ORDER BY 
-    date DESC
-`
-
-func (q *Queries) ListTransactions(ctx context.Context) ([]Transaction, error) {
-	rows, err := q.db.Query(ctx, listTransactions)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []Transaction{}
-	for rows.Next() {
-		var i Transaction
-		if err := rows.Scan(
-			&i.ID,
-			&i.Description,
-			&i.Date,
-			&i.Amount,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }

@@ -19,14 +19,3 @@ FROM
     transactions
 WHERE 
     id = $1;
-
--- name: ListTransactions :many
-SELECT
-  id,
-  description,
-  date,
-  amount
-FROM 
-    transactions
-ORDER BY 
-    date DESC;
