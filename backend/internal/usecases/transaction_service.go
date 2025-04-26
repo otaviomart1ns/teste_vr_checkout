@@ -2,68 +2,74 @@ package usecases
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"time"
 
 	"github.com/otaviomart1ns/teste_vr_checkout/backend/internal/domain/entities"
 	"github.com/otaviomart1ns/teste_vr_checkout/backend/internal/domain/gateways"
+	"github.com/otaviomart1ns/teste_vr_checkout/backend/internal/pkg/utils"
 )
 
 type TransactionRepository interface {
-	Save(ctx context.Context, tx *entities.Transaction) (string, error)
+	Save(ctx context.Context, tx *entities.Transaction) error
 	FindByID(ctx context.Context, id string) (*entities.Transaction, error)
 }
 
-type TransactionQueue interface {
-	PublishTransaction(ctx context.Context, tx *entities.Transaction) error
-}
-
 type TransactionService struct {
-	repo    TransactionRepository
-	queue   TransactionQueue
-	convert gateways.CurrencyGateway
+	producer  gateways.TransactionProducer
+	repo      TransactionRepository
+	converter gateways.CurrencyGateway
 }
 
-func NewTransactionService(repo TransactionRepository, queue TransactionQueue, convert gateways.CurrencyGateway) *TransactionService {
+func NewTransactionService(
+	producer gateways.TransactionProducer,
+	repo TransactionRepository,
+	converter gateways.CurrencyGateway,
+) *TransactionService {
 	return &TransactionService{
-		repo:    repo,
-		queue:   queue,
-		convert: convert,
+		producer:  producer,
+		repo:      repo,
+		converter: converter,
 	}
 }
 
-// Cria uma transação, valida, e publica na fila para persistência assíncrona
-func (s *TransactionService) CreateTransaction(ctx context.Context, description string, date time.Time, valueUSD float64) (*entities.Transaction, error) {
-	tx, err := entities.NewTransaction(description, date, valueUSD)
-	if err != nil {
-		return nil, err
+func (s *TransactionService) CreateTransaction(description string, date time.Time, amount float64) error {
+	if len(description) == 0 || len(description) > 50 {
+		return fmt.Errorf("descrição inválida: deve ter entre 1 e 50 caracteres")
+	}
+	if !utils.IsAlphanumeric(description) {
+		return fmt.Errorf("descrição inválida: apenas caracteres alfanuméricos e espaço são permitidos")
+	}
+	if amount <= 0 || amount > 99999.99 {
+		return fmt.Errorf("valor deve ser maior que 0 e no máximo 99.999,99")
 	}
 
-	if err := s.queue.PublishTransaction(ctx, tx); err != nil {
-		return nil, err
+	tx := &entities.Transaction{
+		ID:          utils.GenerateUUID(),
+		Description: description,
+		Date:        date,
+		ValueUSD:    amount,
 	}
 
-	return tx, nil
+	ctx := context.Background()
+	return s.producer.PublishTransaction(ctx, tx)
 }
 
-// Recupera e converte a transação para moeda desejada
-func (s *TransactionService) GetTransactionConverted(ctx context.Context, id string, currency string) (*gateways.CurrencyConversion, error) {
+func (s *TransactionService) GetTransactionWithConversion(id, currency string) (*entities.Transaction, *gateways.CurrencyConversion, error) {
+	ctx := context.Background()
+
 	tx, err := s.repo.FindByID(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, nil, fmt.Errorf("erro ao buscar transação: %w", err)
 	}
-
 	if tx == nil {
-		return nil, errors.New("transação não encontrada")
+		return nil, nil, fmt.Errorf("transação não encontrada")
 	}
 
-	conversion, err := s.convert.ConvertUSDTo(currency, tx.Date, tx.ValueUSD)
+	converted, err := s.converter.ConvertUSDTo(currency, tx.Date, tx.ValueUSD)
 	if err != nil {
-		return nil, err
+		return nil, nil, fmt.Errorf("erro na conversão: %w", err)
 	}
 
-	conversion.FromCurrency = "USD"
-	conversion.ToCurrency = currency
-
-	return conversion, nil
+	return tx, converted, nil
 }
