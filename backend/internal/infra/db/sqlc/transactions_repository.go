@@ -1,46 +1,59 @@
-package db
+package sqlc
 
 import (
 	"context"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/google/uuid"
-	"github.com/otaviomart1ns/teste_vr_checkout/internal/domain"
-	"github.com/otaviomart1ns/teste_vr_checkout/internal/infra/db/sqlc"
+	"github.com/otaviomart1ns/teste_vr_checkout/backend/internal/domain/entities"
 )
 
 type TransactionRepository struct {
-	q *sqlc.Queries
+	q *Queries
 }
 
-func NewTransactionRepository(q *sqlc.Queries) *TransactionRepository {
-	return &TransactionRepository{q: q}
-}
-
-func (r *TransactionRepository) Save(t *domain.Transaction) error {
-	params := sqlc.CreateTransactionParams{
-		ID:          uuid.MustParse(t.ID),
-		Description: t.Description,
-		Date:        t.Date,
-		Amount:      t.Amount,
+func NewTransactionRepository(db *pgxpool.Pool) *TransactionRepository {
+	return &TransactionRepository{
+		q: New(db),
 	}
-	return r.q.CreateTransaction(context.Background(), params)
 }
 
-func (r *TransactionRepository) GetByID(id string) (*domain.Transaction, error) {
+func (r *TransactionRepository) Save(ctx context.Context, tx *entities.Transaction) error {
+	uid, err := uuid.Parse(tx.ID)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.q.CreateTransaction(ctx, CreateTransactionParams{
+		ID:          uid,
+		Description: tx.Description,
+		Date:        tx.Date,
+		Amount:      tx.ValueUSD,
+	})
+
+	return err
+}
+
+func (r *TransactionRepository) FindByID(ctx context.Context, id string) (*entities.Transaction, error) {
 	txID, err := uuid.Parse(id)
 	if err != nil {
 		return nil, err
 	}
 
-	sqlcTx, err := r.q.GetTransaction(context.Background(), txID)
+	res, err := r.q.GetTransaction(ctx, txID)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 
-	return &domain.Transaction{
-		ID:          sqlcTx.ID.String(),
-		Description: sqlcTx.Description,
-		Date:        sqlcTx.Date,
-		Amount:      sqlcTx.Amount,
+	return &entities.Transaction{
+		ID:          res.ID.String(),
+		Description: res.Description,
+		Date:        res.Date,
+		ValueUSD:    res.Amount,
 	}, nil
 }
