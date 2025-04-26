@@ -1,37 +1,53 @@
 package queue
 
 import (
-	amqp "github.com/rabbitmq/amqp091-go"
+	"context"
+	"encoding/json"
+
+	"github.com/otaviomart1ns/teste_vr_checkout/backend/internal/domain/entities"
+	"github.com/streadway/amqp"
 )
 
-type RabbitMQPublisher struct {
+type TransactionProducer struct {
 	channel *amqp.Channel
-	queue   string
+	queue   amqp.Queue
 }
 
-func NewRabbitMQPublisher(conn *amqp.Connection, queueName string) (*RabbitMQPublisher, error) {
+func NewTransactionProducer(conn *amqp.Connection) (*TransactionProducer, error) {
 	ch, err := conn.Channel()
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = ch.QueueDeclare(queueName, true, false, false, false, nil)
+	q, err := ch.QueueDeclare(
+		"transactions",
+		true,  // durable
+		false, // autoDelete
+		false, // exclusive
+		false, // noWait
+		nil,   // args
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	return &RabbitMQPublisher{
+	return &TransactionProducer{
 		channel: ch,
-		queue:   queueName,
+		queue:   q,
 	}, nil
 }
 
-func (p *RabbitMQPublisher) PublishTransaction(body []byte) error {
+func (p *TransactionProducer) PublishTransaction(_ context.Context, tx *entities.Transaction) error {
+	body, err := json.Marshal(tx)
+	if err != nil {
+		return err
+	}
+
 	return p.channel.Publish(
-		"",          // exchange
-		p.queue,     // routing key
-		false,       // mandatory
-		false,       // immediate
+		"",           // exchange
+		p.queue.Name, // routing key
+		false,        // mandatory
+		false,        // immediate
 		amqp.Publishing{
 			ContentType: "application/json",
 			Body:        body,

@@ -4,69 +4,76 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-	"time"
 
-	"github.com/google/uuid"
-	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/otaviomart1ns/teste_vr_checkout/backend/internal/usecases"
+	"github.com/otaviomart1ns/teste_vr_checkout/backend/internal/domain/entities"
+	"github.com/streadway/amqp"
 )
 
-type TransactionMessage struct {
-	ID          uuid.UUID `json:"id"`
-	Description string    `json:"description"`
-	Date        string    `json:"date"`
-	Amount      float64   `json:"amount"`
+type TransactionSaver interface {
+	Save(ctx context.Context, tx *entities.Transaction) (string, error)
 }
 
 type TransactionConsumer struct {
-	service   usecases.TransactionService
-	channel   *amqp.Channel
-	queueName string
-}
-
-func NewTransactionConsumer(service usecases.TransactionService, ch *amqp.Channel, queueName string) *TransactionConsumer {
-	return &TransactionConsumer{
-		service:   service,
-		channel:   ch,
-		queueName: queueName,
+	conn *amqp.Connection
+	repo interface {
+		Save(ctx context.Context, tx *entities.Transaction) error
 	}
 }
 
+func NewTransactionConsumer(conn *amqp.Connection, repo interface {
+    Save(ctx context.Context, tx *entities.Transaction) error
+}) (*TransactionConsumer, error) {
+	return &TransactionConsumer{
+		conn: conn,
+		repo: repo,
+	}, nil
+}
+
 func (c *TransactionConsumer) StartConsuming() error {
-	msgs, err := c.channel.Consume(
-		c.queueName,
-		"",
+	ch, err := c.conn.Channel()
+	if err != nil {
+		return err
+	}
+
+	q, err := ch.QueueDeclare(
+		"transactions",
+		true,  // durable
+		false, // autoDelete
+		false, // exclusive
+		false, // noWait
+		nil,   // args
+	)
+	if err != nil {
+		return err
+	}
+
+	msgs, err := ch.Consume(
+		q.Name,
+		"",    // consumer tag
 		true,  // auto-ack
 		false, // exclusive
-		false,
-		false,
-		nil,
+		false, // no-local
+		false, // no-wait
+		nil,   // args
 	)
 	if err != nil {
 		return err
 	}
 
 	go func() {
-		for msg := range msgs {
-			var txMsg TransactionMessage
-			if err := json.Unmarshal(msg.Body, &txMsg); err != nil {
-				log.Printf("failed to unmarshal message: %v", err)
+		for d := range msgs {
+			var tx entities.Transaction
+			if err := json.Unmarshal(d.Body, &tx); err != nil {
+				log.Println("Erro ao decodificar mensagem:", err)
 				continue
 			}
 
-			date, err := time.Parse("2006-01-02", txMsg.Date)
-			if err != nil {
-				log.Printf("invalid date in message: %v", err)
+			if err := c.repo.Save(context.Background(), &tx); err != nil {
+				log.Println("Erro ao salvar no banco:", err)
 				continue
 			}
 
-			_, err = c.service.CreateTransaction(context.Background(), txMsg.Description, date, txMsg.Amount)
-			if err != nil {
-				log.Printf("failed to save transaction: %v", err)
-				continue
-			}
-
-			log.Printf("transaction %s persisted successfully", txMsg.ID)
+			log.Printf("Transação salva: %s\n", tx.ID)
 		}
 	}()
 
