@@ -15,7 +15,6 @@ type TransactionService interface {
 	GetTransactionWithConversion(id string, currency string) (*entities.Transaction, *gateways.CurrencyConversion, error)
 }
 
-
 type TransactionHandler struct {
 	service TransactionService
 }

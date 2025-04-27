@@ -21,7 +21,7 @@ type TransactionConsumer struct {
 }
 
 func NewTransactionConsumer(conn *amqp.Connection, repo interface {
-    Save(ctx context.Context, tx *entities.Transaction) error
+	Save(ctx context.Context, tx *entities.Transaction) error
 }) (*TransactionConsumer, error) {
 	return &TransactionConsumer{
 		conn: conn,
