@@ -38,6 +38,9 @@ services:
     environment:
       - POSTGRES_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
       - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@broker:${RABBIT_PORT}/
+      - TREASURY_API_BASE_URL=${TREASURY_API_BASE_URL}
+      - TREASURY_API_ENDPOINT=${TREASURY_API_ENDPOINT}
+      - API_PORT=${API_PORT}
     networks:
       - app-net
     ports:
@@ -53,6 +56,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     restart: always
+    environment:
+      - API_URL=http://api:${API_PORT}
     networks:
       - app-net
     ports:
