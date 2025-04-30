@@ -18,7 +18,7 @@ type Config struct {
 }
 
 func Load() *Config {
-	err := godotenv.Load("../.env")
+	err := godotenv.Load()
 	if err != nil {
 		log.Println("Warning: .env não encontrado no caminho esperado")
 	}
