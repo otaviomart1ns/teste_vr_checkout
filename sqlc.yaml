@@ -8,6 +8,7 @@ sql:
 - engine: "postgresql"
   queries: "/backend/internal/infra/db/queries"
   schema: "/backend/internal/infra/db/migrations"
+  strict_order_by: false
   codegen:
   - plugin: golang
     out: "/backend/internal/infra/db/sqlc"
