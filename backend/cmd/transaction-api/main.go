@@ -19,6 +19,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// @title API - VR Checkout
+// @version 1.0
+// @description Documentação da API REST para o teste da VR Software
+// @host localhost:8080
+// @BasePath /
+// @schemes http
 func main() {
 	// Carrega variáveis de ambiente
 	cfg := config.Load()

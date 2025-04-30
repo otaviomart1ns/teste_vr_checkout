@@ -1,0 +1,147 @@
+basePath: /
+definitions:
+  dto.CreateTransactionRequest:
+    properties:
+      amount_usd:
+        type: number
+      date:
+        type: string
+      description:
+        maxLength: 50
+        type: string
+    required:
+    - amount_usd
+    - date
+    - description
+    type: object
+  dto.TransactionResponse:
+    properties:
+      amount_converted:
+        type: number
+      amount_usd:
+        type: number
+      date:
+        type: string
+      description:
+        type: string
+      exchange_rate:
+        type: number
+      id:
+        type: string
+      rate_date:
+        type: string
+      to_currency:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Documentação da API REST para o teste da VR Software
+  title: API - VR Checkout
+  version: "1.0"
+paths:
+  /currencies:
+    get:
+      description: Busca a lista de moedas e países com taxa de câmbio do Dolar
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Lista de descrições de moedas (ex: Brazil-Real)'
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: 'Exemplo: { \"error\": \"mensagem de erro\" }'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lista as moedas disponíveis
+      tags:
+      - currencies
+  /transactions:
+    post:
+      consumes:
+      - application/json
+      description: Cria uma nova transação
+      parameters:
+      - description: Dados da transação
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TransactionResponse'
+        "400":
+          description: 'Exemplo: { \"error\": \"mensagem de erro\" }'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cria uma nova transação
+      tags:
+      - transactions
+  /transactions/{id}:
+    get:
+      description: Retorna uma transação com valor convertido para a moeda escolhida
+        pelo seu ID
+      parameters:
+      - description: ID da transação
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TransactionResponse'
+        "404":
+          description: 'Exemplo: { \"error\": \"mensagem de erro\" }'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca uma transação pelo ID
+      tags:
+      - transactions
+  /transactions/latest:
+    get:
+      description: Retorna as últimas transações registradas, ordenadas por ordem
+        de inserção
+      parameters:
+      - description: 'Número de transações a retornar (padrão: 5)'
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.TransactionResponse'
+            type: array
+        "500":
+          description: 'Exemplo: { \"error\": \"mensagem de erro\" }'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lista as últimas transações
+      tags:
+      - transactions
+schemes:
+- http
+swagger: "2.0"

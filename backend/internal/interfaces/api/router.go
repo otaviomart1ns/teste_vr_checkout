@@ -1,10 +1,14 @@
 package api
 
 import (
+	"time"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	_ "github.com/otaviomart1ns/teste_vr_checkout/backend/internal/docs"
 	"github.com/otaviomart1ns/teste_vr_checkout/backend/internal/interfaces/api/handlers"
-	"time"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func SetupRouter(
@@ -37,6 +41,8 @@ func SetupRouter(
 
 	// Moedas disponíveis
 	router.GET("/currencies", currencyHandler.GetCurrencies)
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }

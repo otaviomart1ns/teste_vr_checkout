@@ -25,6 +25,16 @@ func NewTransactionHandler(service TransactionService) *TransactionHandler {
 	return &TransactionHandler{service: service}
 }
 
+// CreateTransaction godoc
+// @Summary Cria uma nova transação
+// @Description Cria uma nova transação
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Param request body dto.CreateTransactionRequest true "Dados da transação"
+// @Success 200 {object} dto.TransactionResponse
+// @Failure 400 {object} map[string]string "Exemplo: { \"error\": \"mensagem de erro\" }"
+// @Router /transactions [post]
 func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	var req dto.CreateTransactionRequest
 
@@ -47,6 +57,15 @@ func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	c.Status(http.StatusAccepted)
 }
 
+// GetTransaction godoc
+// @Summary Busca uma transação pelo ID
+// @Description Retorna uma transação com valor convertido para a moeda escolhida pelo seu ID
+// @Tags transactions
+// @Produce json
+// @Param id path string true "ID da transação"
+// @Success 200 {object} dto.TransactionResponse
+// @Failure 404 {object} map[string]string "Exemplo: { \"error\": \"mensagem de erro\" }"
+// @Router /transactions/{id} [get]
 func (h *TransactionHandler) GetTransaction(c *gin.Context) {
 	id := c.Param("id")
 	currency := c.Query("currency")
@@ -73,6 +92,15 @@ func (h *TransactionHandler) GetTransaction(c *gin.Context) {
 	})
 }
 
+// GetLatestTransactions godoc
+// @Summary Lista as últimas transações
+// @Description Retorna as últimas transações registradas, ordenadas por ordem de inserção
+// @Tags transactions
+// @Produce json
+// @Param limit query int false "Número de transações a retornar (padrão: 5)"
+// @Success 200 {array} dto.TransactionResponse
+// @Failure 500 {object} map[string]string "Exemplo: { \"error\": \"mensagem de erro\" }"
+// @Router /transactions/latest [get]
 func (h *TransactionHandler) GetLatestTransactions(c *gin.Context) {
 	limitParam := c.Query("limit")
 	limit, err := strconv.Atoi(limitParam)
