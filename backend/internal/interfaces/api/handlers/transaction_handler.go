@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -13,6 +14,7 @@ import (
 type TransactionService interface {
 	CreateTransaction(description string, date time.Time, amount float64) error
 	GetTransactionWithConversion(id string, currency string) (*entities.Transaction, *gateways.CurrencyConversion, error)
+	GetLatestTransactions(limit int32) ([]*entities.Transaction, error)
 }
 
 type TransactionHandler struct {
@@ -69,4 +71,30 @@ func (h *TransactionHandler) GetTransaction(c *gin.Context) {
 		ToCurrency:      converted.ToCurrency,
 		RateDate:        converted.DateUsed.Format("2006-01-02"),
 	})
+}
+
+func (h *TransactionHandler) GetLatestTransactions(c *gin.Context) {
+	limitParam := c.Query("limit")
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil || limit <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Query param 'limit' deve ser um número inteiro positivo"})
+		return
+	}
+
+	transactions, err := h.service.GetLatestTransactions(int32(limit))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var result []*entities.Transaction
+	for _, tx := range transactions {
+		result = append(result, &entities.Transaction{
+			ID:              tx.ID,
+			Description:     tx.Description,
+			Date:            tx.Date,
+			ValueUSD:       tx.ValueUSD,
+		})
+	}
+	c.JSON(http.StatusOK, result)
 }

@@ -13,6 +13,7 @@ import (
 type TransactionRepository interface {
 	Save(ctx context.Context, tx *entities.Transaction) error
 	FindByID(ctx context.Context, id string) (*entities.Transaction, error)
+	GetLatestTransactions(ctx context.Context, limit int32) ([]*entities.Transaction, error)
 }
 
 type TransactionService struct {
@@ -72,4 +73,15 @@ func (s *TransactionService) GetTransactionWithConversion(id, currency string) (
 	}
 
 	return tx, converted, nil
+}
+
+func (s *TransactionService) GetLatestTransactions(limit int32) ([]*entities.Transaction, error) {
+	ctx := context.Background()
+
+	transactions, err := s.repo.GetLatestTransactions(ctx, limit)
+	if err != nil {
+		return nil, fmt.Errorf("erro ao buscar últimas transações: %w", err)
+	}
+
+	return transactions, nil
 }

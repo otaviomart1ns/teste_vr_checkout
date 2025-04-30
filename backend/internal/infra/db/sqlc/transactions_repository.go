@@ -57,3 +57,22 @@ func (r *TransactionRepository) FindByID(ctx context.Context, id string) (*entit
 		ValueUSD:    res.Amount,
 	}, nil
 }
+
+func (r *TransactionRepository) GetLatestTransactions(ctx context.Context, limit int32) ([]*entities.Transaction, error) {
+	results, err := r.q.GetLatestTransactions(ctx, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	var transactions []*entities.Transaction
+	for _, res := range results {
+		transactions = append(transactions, &entities.Transaction{
+			ID:          res.ID.String(),
+			Description: res.Description,
+			Date:        res.Date,
+			ValueUSD:    res.Amount,
+		})
+	}
+
+	return transactions, nil
+}
