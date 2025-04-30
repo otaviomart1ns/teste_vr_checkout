@@ -8,10 +8,10 @@ import (
 )
 
 type Transaction struct {
-	ID          string
-	Description string
-	Date        time.Time
-	ValueUSD    float64
+	ID          string    `json:"id"`
+	Description string    `json:"description"`
+	Date        time.Time `json:"date"`
+	ValueUSD    float64   `json:"amount_usd"`
 }
 
 func NewTransaction(description string, date time.Time, valueUSD float64) (*Transaction, error) {
