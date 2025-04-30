@@ -9,7 +9,7 @@ RUN apt-get install -y curl git unzip
 ARG FLUTTER_SDK=/usr/local/flutter
 ARG FLUTTER_VERSION=3.29.3
 ARG APP=/app/
-ARG API_URL
+ARG API_URI
 
 #clone flutter
 RUN git clone https://github.com/flutter/flutter.git $FLUTTER_SDK
@@ -30,7 +30,7 @@ COPY . $APP
 # stup new folder as the working directory
 WORKDIR $APP
 
-RUN echo "API_URL=${API_URL}" > .env
+RUN echo "API_URI=${API_URI}" > .env
 
 # Run build: 1 - clean, 2 - pub get, 3 - build web
 RUN flutter clean
