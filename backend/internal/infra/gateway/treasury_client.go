@@ -48,7 +48,6 @@ func (c *TreasuryClient) ConvertUSDTo(desc string, date time.Time, amount float6
 		)
 		fmt.Printf("URL chamada para moedas: %s\n", finalURL)
 
-
 		resp, err := c.client.Get(finalURL)
 		if err != nil {
 			continue
@@ -74,7 +73,7 @@ func (c *TreasuryClient) ConvertUSDTo(desc string, date time.Time, amount float6
 		converted := float64(int(rate*amount*100+0.5)) / 100
 
 		return &gateways.CurrencyConversion{
-			FromCurrency: "USD",
+			FromCurrency: "Canada-Dollar",
 			ToCurrency:   desc,
 			Rate:         rate,
 			Converted:    converted,
