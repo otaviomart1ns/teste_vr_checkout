@@ -29,6 +29,11 @@ services:
     ports:
       - "${RABBIT_MANAGEMENT_PORT}:15672"
       - "${RABBIT_PORT}:5672"
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   api:
     build:

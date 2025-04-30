@@ -50,6 +50,7 @@ func (c *CurrencyMetaClient) GetAvailableCurrencies() ([]string, error) {
 		c.baseURL,
 		c.endpoint,
 	)
+	fmt.Printf("URL chamada para moedas: %s\n", finalURL)
 
 	resp, err := c.client.Get(finalURL)
 	if err != nil {

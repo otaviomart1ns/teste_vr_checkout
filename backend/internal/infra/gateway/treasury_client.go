@@ -46,6 +46,8 @@ func (c *TreasuryClient) ConvertUSDTo(desc string, date time.Time, amount float6
 			c.endpoint,
 			filter,
 		)
+		fmt.Printf("URL chamada para moedas: %s\n", finalURL)
+
 
 		resp, err := c.client.Get(finalURL)
 		if err != nil {
