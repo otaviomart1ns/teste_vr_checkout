@@ -40,7 +40,7 @@ class LatestTransactionsWidget extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    '${tx['Description']} • ${(DateTime.parse(tx['Date'])).toIso8601String().split("T").first} • \$${(tx['ValueUSD'] as num).toStringAsFixed(2)} • ${tx['ID']}',
+                    '${tx['description']} • ${(DateTime.parse(tx['date'])).toIso8601String().split("T").first} • \$${(tx['amount_usd'] as num).toStringAsFixed(2)} • ${tx['id']}',
                     style: const TextStyle(fontSize: 13),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -49,7 +49,7 @@ class LatestTransactionsWidget extends StatelessWidget {
                   icon: const Icon(Icons.copy, size: 18),
                   tooltip: 'Copiar UUID',
                   onPressed: () async {
-                    await Clipboard.setData(ClipboardData(text: tx['ID']));
+                    await Clipboard.setData(ClipboardData(text: tx['id']));
                     if (!context.mounted) return;
                     SnackBarService.showSuccess(context, 'UUID copiado!');
                   },
