@@ -11,7 +11,7 @@ help:
 	@echo "Targets: build, up, down, db-up, createdb, migrationup, migrationdown, sqlc, test, server"
 
 build: ## Builda todas as imagens Docker
-	docker compose -f $(COMPOSE_FILE) build
+	docker compose -f $(COMPOSE_FILE) --build
 
 up: ## Sobe containers (detached)
 	docker compose -f $(COMPOSE_FILE) up -d
