@@ -1,10 +1,10 @@
 package api
 
 import (
-	"time"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/otaviomart1ns/teste_vr_checkout/backend/internal/interfaces/api/handlers"
+	"time"
 )
 
 func SetupRouter(

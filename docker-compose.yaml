@@ -41,6 +41,7 @@ services:
       - TREASURY_API_BASE_URL=${TREASURY_API_BASE_URL}
       - TREASURY_API_ENDPOINT=${TREASURY_API_ENDPOINT}
       - API_PORT=${API_PORT}
+      - GIN_MODE=${GIN_MODE}
     networks:
       - app-net
     ports:

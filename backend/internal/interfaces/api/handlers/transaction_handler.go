@@ -90,10 +90,10 @@ func (h *TransactionHandler) GetLatestTransactions(c *gin.Context) {
 	var result []*entities.Transaction
 	for _, tx := range transactions {
 		result = append(result, &entities.Transaction{
-			ID:              tx.ID,
-			Description:     tx.Description,
-			Date:            tx.Date,
-			ValueUSD:       tx.ValueUSD,
+			ID:          tx.ID,
+			Description: tx.Description,
+			Date:        tx.Date,
+			ValueUSD:    tx.ValueUSD,
 		})
 	}
 	c.JSON(http.StatusOK, result)
