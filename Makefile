@@ -46,4 +46,4 @@ test:
 	go test -v -cover ./...
 
 server:
-	go run main.go
+	go run cmd/transaction-api/main.go
