@@ -11,8 +11,6 @@ ARG FLUTTER_VERSION=3.29.3
 ARG APP=/app/
 ARG API_URL
 
-RUN echo "API_URL=${API_URL}" > .env
-
 #clone flutter
 RUN git clone https://github.com/flutter/flutter.git $FLUTTER_SDK
 # change dir to current flutter folder and make a checkout to the specific version
@@ -31,6 +29,8 @@ RUN mkdir $APP
 COPY . $APP
 # stup new folder as the working directory
 WORKDIR $APP
+
+RUN echo "API_URL=${API_URL}" > .env
 
 # Run build: 1 - clean, 2 - pub get, 3 - build web
 RUN flutter clean
