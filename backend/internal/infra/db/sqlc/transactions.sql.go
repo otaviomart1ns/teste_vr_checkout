@@ -48,6 +48,44 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 	return i, err
 }
 
+const getLatestTransactions = `-- name: GetLatestTransactions :many
+SELECT
+    id,
+    description,
+    date,
+    amount
+FROM 
+    transactions
+ORDER BY 
+    ctid DESC
+LIMIT $1
+`
+
+func (q *Queries) GetLatestTransactions(ctx context.Context, limit int32) ([]Transaction, error) {
+	rows, err := q.db.Query(ctx, getLatestTransactions, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Transaction{}
+	for rows.Next() {
+		var i Transaction
+		if err := rows.Scan(
+			&i.ID,
+			&i.Description,
+			&i.Date,
+			&i.Amount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getTransaction = `-- name: GetTransaction :one
 SELECT
   id,

@@ -12,6 +12,7 @@ import (
 
 type Querier interface {
 	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error)
+	GetLatestTransactions(ctx context.Context, limit int32) ([]Transaction, error)
 	GetTransaction(ctx context.Context, id uuid.UUID) (Transaction, error)
 }
 

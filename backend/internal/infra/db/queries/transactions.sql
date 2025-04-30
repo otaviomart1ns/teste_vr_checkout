@@ -19,3 +19,15 @@ FROM
     transactions
 WHERE 
     id = $1;
+
+-- name: GetLatestTransactions :many
+SELECT
+    id,
+    description,
+    date,
+    amount
+FROM 
+    transactions
+ORDER BY 
+    ctid DESC
+LIMIT $1;
