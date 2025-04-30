@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
@@ -13,6 +14,7 @@ type Config struct {
 	TreasuryBaseURL string
 	TreasureEndpont string
 	ServerPort      string
+	GinMode         string
 }
 
 func Load() *Config {
@@ -46,11 +48,19 @@ func Load() *Config {
 		log.Fatal("API_PORT environment variable is required")
 	}
 
+	ginMode := os.Getenv("GIN_MODE")
+	if ginMode == "" {
+		ginMode = gin.DebugMode
+	}
+	gin.SetMode(ginMode)
+	log.Printf("GIN_MODE definido como: %s", ginMode)
+
 	return &Config{
 		PostgresURL:     postgresURL,
 		RabbitMQURL:     rabbitMQURL,
 		TreasuryBaseURL: treasuryBaseURL,
 		TreasureEndpont: treasuryEndpoint,
 		ServerPort:      serverPort,
+		GinMode:         ginMode,
 	}
 }
