@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -18,11 +17,6 @@ type Config struct {
 }
 
 func Load() *Config {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("Warning: .env não encontrado no caminho esperado")
-	}
-
 	postgresURL, ok := os.LookupEnv("POSTGRES_URL")
 	if !ok || postgresURL == "" {
 		log.Fatal("POSTGRES_URL environment variable is required")
@@ -48,7 +42,7 @@ func Load() *Config {
 		log.Fatal("API_PORT environment variable is required")
 	}
 
-	ginMode := os.Getenv("GIN_MODE")
+	ginMode, _ := os.LookupEnv("GIN_MODE")
 	if ginMode == "" {
 		ginMode = gin.DebugMode
 	}
