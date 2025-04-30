@@ -62,7 +62,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        API_URL: http://api:${API_PORT}
+        API_URL: http://localhost:${API_PORT}
     restart: always
     networks:
       - app-net
