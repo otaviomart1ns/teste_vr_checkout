@@ -12,7 +12,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o api ./cmd/transaction-api
 
 # Run stage
-FROM scratch
+FROM alpine:latest
 
 WORKDIR /app
 
