@@ -3,7 +3,7 @@ ifneq (,$(wildcard ./.env))
   export
 endif
 
-COMPOSE_FILE = docker-compose.yml
+COMPOSE_FILE = docker-compose.yaml
 
 .PHONY: help build up down postgresql createdb migrationup migrationdown sqlc test server
 
