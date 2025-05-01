@@ -32,8 +32,7 @@ func NewTransactionHandler(service TransactionService) *TransactionHandler {
 // @Accept json
 // @Produce json
 // @Param request body dto.CreateTransactionRequest true "Dados da transação"
-// @Success 200 {object} dto.TransactionResponse
-// @Failure 400 {object} map[string]string "Exemplo: { \"error\": \"mensagem de erro\" }"
+// @Success 202 {string} string "Aceita para processamento assíncrono (sem corpo)"
 // @Router /transactions [post]
 func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	var req dto.CreateTransactionRequest

@@ -161,6 +161,8 @@ make test-frontend
 
 > Base URL: `http://localhost:8080`
 
+> Swagger URL: `http://localhost:8080/swagger/index.html`
+
 1. **POST** `/transactions`
 
 Cria uma nova transação.

@@ -69,19 +69,10 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Aceita para processamento assíncrono (sem corpo)",
                         "schema": {
-                            "$ref": "#/definitions/dto.TransactionResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Exemplo: { \\\"error\\\": \\\"mensagem de erro\\\" }",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
