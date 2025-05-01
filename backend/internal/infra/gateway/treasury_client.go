@@ -32,7 +32,6 @@ func NewTreasuryClient(cfg *config.Config, customClient *http.Client) *TreasuryC
 	}
 }
 
-
 type treasuryResponse struct {
 	Data []struct {
 		ExchangeRate string `json:"exchange_rate"`

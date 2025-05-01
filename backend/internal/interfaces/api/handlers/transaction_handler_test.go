@@ -263,4 +263,3 @@ func TestCreateTransaction_ServiceError(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 	assert.Contains(t, w.Body.String(), "error")
 }
-

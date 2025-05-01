@@ -33,8 +33,8 @@ func TestConvertUSDTo_Success(t *testing.T) {
 	defer srv.Close()
 
 	cfg := &config.Config{
-		TreasuryBaseURL:  srv.URL,
-		TreasureEndpont:  "mockendpoint",
+		TreasuryBaseURL: srv.URL,
+		TreasureEndpont: "mockendpoint",
 	}
 	client := gateway.NewTreasuryClient(cfg, &http.Client{Timeout: 10 * time.Second})
 
@@ -62,7 +62,6 @@ func TestConvertUSDTo_EmptyResponse(t *testing.T) {
 		TreasureEndpont: "mockendpoint",
 	}
 	client := gateway.NewTreasuryClient(cfg, &http.Client{Timeout: 10 * time.Second})
-
 
 	result, err := client.ConvertUSDTo("Brazil-Real", time.Now(), 100.0)
 	assert.Nil(t, result)
@@ -104,8 +103,8 @@ func TestConvertUSDTo_InvalidJSON(t *testing.T) {
 
 func TestConvertUSDTo_HTTPClientError(t *testing.T) {
 	cfg := &config.Config{
-		TreasuryBaseURL:  "http://127.0.0.1:0",
-		TreasureEndpont:  "mockendpoint",
+		TreasuryBaseURL: "http://127.0.0.1:0",
+		TreasureEndpont: "mockendpoint",
 	}
 	client := gateway.NewTreasuryClient(cfg, &http.Client{Timeout: 50 * time.Millisecond})
 
@@ -148,4 +147,3 @@ func TestNewTreasuryClient_DefaultClientUsed(t *testing.T) {
 	assert.NotNil(t, client)
 	assert.NotNil(t, client.ConvertUSDTo)
 }
-

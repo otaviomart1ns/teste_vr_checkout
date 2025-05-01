@@ -75,10 +75,10 @@ func TestTransactionConsumer_Integration(t *testing.T) {
 	assert.NoError(t, err)
 
 	err = ch.Publish(
-		"",           // exchange
-		q.Name,       // routing key
-		false,        // mandatory
-		false,        // immediate
+		"",     // exchange
+		q.Name, // routing key
+		false,  // mandatory
+		false,  // immediate
 		amqp.Publishing{
 			ContentType: "application/json",
 			Body:        body,
