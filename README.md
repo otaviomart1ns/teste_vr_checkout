@@ -249,7 +249,8 @@ make createdb        # Cria o banco de dados
 make migrationup     # Aplica as migrações
 make migrationdown   # Reverte a última migração
 make sqlc            # Gera código Go com SQLC
-make test            # Executa os testes do backend
+make test-backend    # Executa os testes do backend
+make test-frontend   # Executa os testes do frontend
 make server          # Executa a API localmente (fora do Docker)
 ```
 
