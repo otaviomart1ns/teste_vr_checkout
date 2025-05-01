@@ -80,6 +80,18 @@ paths:
           description: Aceita para processamento assíncrono (sem corpo)
           schema:
             type: string
+        "400":
+          description: Dados inválidos ou campos faltando
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
       summary: Cria uma nova transação
       tags:
       - transactions
