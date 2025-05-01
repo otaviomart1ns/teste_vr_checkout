@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -17,6 +18,8 @@ type Config struct {
 }
 
 func Load() *Config {
+	_ = godotenv.Load()
+	
 	postgresURL, ok := os.LookupEnv("POSTGRES_URL")
 	if !ok || postgresURL == "" {
 		log.Fatal("POSTGRES_URL environment variable is required")

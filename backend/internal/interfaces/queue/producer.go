@@ -9,8 +9,8 @@ import (
 )
 
 type TransactionProducer struct {
-	channel *amqp.Channel
-	queue   amqp.Queue
+	Channel *amqp.Channel
+	Queue   amqp.Queue
 }
 
 func NewTransactionProducer(conn *amqp.Connection) (*TransactionProducer, error) {
@@ -32,8 +32,8 @@ func NewTransactionProducer(conn *amqp.Connection) (*TransactionProducer, error)
 	}
 
 	return &TransactionProducer{
-		channel: ch,
-		queue:   q,
+		Channel: ch,
+		Queue:   q,
 	}, nil
 }
 
@@ -43,9 +43,9 @@ func (p *TransactionProducer) PublishTransaction(_ context.Context, tx *entities
 		return err
 	}
 
-	return p.channel.Publish(
+	return p.Channel.Publish(
 		"",           // exchange
-		p.queue.Name, // routing key
+		p.Queue.Name, // routing key
 		false,        // mandatory
 		false,        // immediate
 		amqp.Publishing{

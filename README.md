@@ -1,4 +1,4 @@
-# Projeto VR Software - Flutter + Go API
+# Projeto VR Software - Flutter + Golang
 
 ## 📌 Descrição
 
@@ -143,13 +143,13 @@ make migrationup
 
 ## 🧪 Executar Testes
 
-### Backend
+### Backend - Cobertura 95%
 
 ```bash
 make test-backend
 ```
 
-### Frontend
+### Frontend - Cobertura 
 
 ```bash
 make test-frontend

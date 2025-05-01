@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -47,7 +49,7 @@ func main() {
 	repo := sqlc.NewTransactionRepository(pool)
 
 	// Clients externos
-	treasuryClient := gateway.NewTreasuryClient(cfg)
+	treasuryClient := gateway.NewTreasuryClient(cfg, &http.Client{Timeout: 10 * time.Second})
 	currencyMetaClient := gateway.NewCurrencyMetaClient(cfg)
 
 	// Producer e Consumer

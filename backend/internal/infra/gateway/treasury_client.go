@@ -19,13 +19,19 @@ type TreasuryClient struct {
 	client   *http.Client
 }
 
-func NewTreasuryClient(cfg *config.Config) *TreasuryClient {
+func NewTreasuryClient(cfg *config.Config, customClient *http.Client) *TreasuryClient {
+	client := customClient
+	if client == nil {
+		client = &http.Client{Timeout: 10 * time.Second}
+	}
+
 	return &TreasuryClient{
 		baseURL:  strings.TrimSuffix(cfg.TreasuryBaseURL, "/"),
 		endpoint: strings.TrimPrefix(cfg.TreasureEndpont, "/"),
-		client:   &http.Client{Timeout: 10 * time.Second},
+		client:   client,
 	}
 }
+
 
 type treasuryResponse struct {
 	Data []struct {

@@ -5,10 +5,10 @@ endif
 
 COMPOSE_FILE = docker-compose.yaml
 
-.PHONY: help build up down postgresql createdb migrationup migrationdown sqlc test server
+.PHONY: help build up down postgresql createdb migrationup migrationdown sqlc test-backend server
 
 help:
-	@echo "Targets: build, up, down, db-up, createdb, migrationup, migrationdown, sqlc, test, server"
+	@echo "Targets: build, up, down, db-up, createdb, migrationup, migrationdown, sqlc, test-backend, server"
 
 build: ## Builda todas as imagens Docker
 	docker compose -f $(COMPOSE_FILE) build
@@ -42,8 +42,22 @@ migrationdown: ## Reverte migrações
 sqlc:
 	docker run --rm -v $$(pwd):/src -w /src sqlc/sqlc generate
 
-test:
-	go test -v -cover ./...
+test-backend:
+	@export POSTGRES_USER=$(POSTGRES_USER); \
+	export POSTGRES_PASSWORD=$(POSTGRES_PASSWORD); \
+	export POSTGRES_DB=$(POSTGRES_DB); \
+	export POSTGRES_PORT=$(POSTGRES_PORT); \
+	export RABBITMQ_DEFAULT_USER=$(RABBITMQ_DEFAULT_USER); \
+	export RABBITMQ_DEFAULT_PASS=$(RABBITMQ_DEFAULT_PASS); \
+	export RABBIT_PORT=$(RABBIT_PORT); \
+	export API_PORT=$(API_PORT); \
+	export FLUTTER_PORT=$(FLUTTER_PORT); \
+	export TREASURY_API_BASE_URL=$(TREASURY_API_BASE_URL); \
+	export TREASURY_API_ENDPOINT=$(TREASURY_API_ENDPOINT); \
+	export GIN_MODE=$(GIN_MODE); \
+	export POSTGRES_URL=postgresql://$${POSTGRES_USER}:$${POSTGRES_PASSWORD}@localhost:$${POSTGRES_PORT}/$${POSTGRES_DB}; \
+	export RABBITMQ_URL=amqp://$${RABBITMQ_DEFAULT_USER}:$${RABBITMQ_DEFAULT_PASS}@localhost:$${RABBIT_PORT}/; \
+	cd backend && go test -v -coverprofile=coverage.out ./...
 
 server:
-	go run cmd/transaction-api/main.go
+	cd backend && go run cmd/transaction-api/main.go
