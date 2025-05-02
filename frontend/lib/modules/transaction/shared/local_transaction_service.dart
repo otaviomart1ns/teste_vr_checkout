@@ -20,6 +20,7 @@ class LocalTransactionService {
     await box.delete(id);
   }
 
+  /// Lista transações
   Future<List<LocalTransaction>> getAllLocalTransactions() async {
     final box = await _openBox();
     return box.values.toList();

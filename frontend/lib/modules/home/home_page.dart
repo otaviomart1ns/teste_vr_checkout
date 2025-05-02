@@ -16,7 +16,7 @@ class HomePage extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(
               maxWidth: 400,
-            ), // <= Limite horizontal
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
