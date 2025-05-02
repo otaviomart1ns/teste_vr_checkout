@@ -52,7 +52,7 @@ func TestTransactionConsumer_Integration(t *testing.T) {
 	done := make(chan bool)
 
 	tx := &entities.Transaction{
-		ID:          "consumer-test-id",
+		ID:          "a664d78d-cce6-4770-b287-b176a9e6e62b",
 		Description: "Teste Consumer",
 		Date:        time.Now().UTC(),
 		ValueUSD:    55.55,
@@ -142,7 +142,7 @@ func TestTransactionConsumer_SaveError(t *testing.T) {
 	defer ch.Close()
 
 	tx := &entities.Transaction{
-		ID:          "fail-save-id",
+		ID:          "a664d78d-cce6-4770-b287-b176a9e6e62c",
 		Description: "Teste Save Error",
 		Date:        time.Now().UTC(),
 		ValueUSD:    77.77,

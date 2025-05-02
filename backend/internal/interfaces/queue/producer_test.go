@@ -54,7 +54,7 @@ func TestPublishTransaction_Integration(t *testing.T) {
 	defer ch.Close()
 
 	tx := &entities.Transaction{
-		ID:          "test-123",
+		ID:          "a664d78d-cce6-4770-b287-b176a9e6e62d",
 		Description: "Transação de Teste",
 		Date:        time.Now().UTC(),
 		ValueUSD:    99.99,

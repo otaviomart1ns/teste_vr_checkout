@@ -116,16 +116,16 @@ func TestGetTransactionWithConversion_Success(t *testing.T) {
 		ValueUSD:    100.0,
 	}
 	converted := &gateways.CurrencyConversion{
-		ToCurrency: "BRL",
+		ToCurrency: "Brazil-Real",
 		Rate:       5.0,
 		Converted:  500.0,
 		DateUsed:   tx.Date,
 	}
 
 	mockRepo.On("FindByID", mock.Anything, "123").Return(tx, nil)
-	mockConverter.On("ConvertUSDTo", "BRL", tx.Date, tx.ValueUSD).Return(converted, nil)
+	mockConverter.On("ConvertUSDTo", "Brazil-Real", tx.Date, tx.ValueUSD).Return(converted, nil)
 
-	resultTx, resultConv, err := svc.GetTransactionWithConversion("123", "BRL")
+	resultTx, resultConv, err := svc.GetTransactionWithConversion("123", "Brazil-Real")
 
 	assert.NoError(t, err)
 	assert.Equal(t, tx, resultTx)
@@ -138,7 +138,7 @@ func TestGetTransactionWithConversion_TransactionNotFound(t *testing.T) {
 
 	mockRepo.On("FindByID", mock.Anything, "123").Return(nil, nil)
 
-	_, _, err := svc.GetTransactionWithConversion("123", "BRL")
+	_, _, err := svc.GetTransactionWithConversion("123", "Brazil-Real")
 	assert.EqualError(t, err, "transação não encontrada")
 }
 
@@ -148,7 +148,7 @@ func TestGetTransactionWithConversion_RepoError(t *testing.T) {
 
 	mockRepo.On("FindByID", mock.Anything, "123").Return(nil, assert.AnError)
 
-	_, _, err := svc.GetTransactionWithConversion("123", "BRL")
+	_, _, err := svc.GetTransactionWithConversion("123", "Brazil-Real")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "erro ao buscar transação")
 }
@@ -167,9 +167,9 @@ func TestGetTransactionWithConversion_ConversionError(t *testing.T) {
 	}
 
 	mockRepo.On("FindByID", mock.Anything, "123").Return(tx, nil)
-	mockConverter.On("ConvertUSDTo", "BRL", tx.Date, tx.ValueUSD).Return(nil, assert.AnError)
+	mockConverter.On("ConvertUSDTo", "Brazil-Real", tx.Date, tx.ValueUSD).Return(nil, assert.AnError)
 
-	_, _, err := svc.GetTransactionWithConversion("123", "BRL")
+	_, _, err := svc.GetTransactionWithConversion("123", "Brazil-Real")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "erro na conversão")
 }
