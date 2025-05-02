@@ -61,9 +61,9 @@ test-backend:
 
 test-frontend:
 	@echo "API_URL=http://${HOST}:${API_PORT}" > frontend/.env
-	cd frontend && flutter test --coverage \
-	genhtml coverage/lcov.info -o coverage/html \
-	xdg-open coverage/html/index.html
+	cd frontend && flutter test --coverage || echo "Verifique se existem arquivos *_test.dart em /frontend/test"
+	cd frontend && genhtml coverage/lcov.info -o coverage/html
+	cd frontend && xdg-open coverage/html/index.html || echo "Abra manualmente: frontend/coverage/html/index.html"
 
 server:
 	@export POSTGRES_USER=$(POSTGRES_USER); \

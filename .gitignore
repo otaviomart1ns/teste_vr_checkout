@@ -80,6 +80,7 @@ analysis_benchmark.json
 .packages.generated
 
 # Flutter/Dart/Pub related
+temp_hive_dir/
 **/doc/api/
 .dart_tool/
 .flutter-plugins

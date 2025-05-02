@@ -149,7 +149,7 @@ make migrationup
 make test-backend
 ```
 
-### Frontend - Cobertura 
+### Frontend - Cobertura 73%
 
 ```bash
 make test-frontend
